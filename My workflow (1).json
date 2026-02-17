@@ -1,0 +1,142 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "atagym-chat",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "8b51ffa1-2ff1-4c8c-b146-d787178bce33",
+      "name": "Webhook",
+      "webhookId": "834da3ee-bace-4241-b607-828a15e53911"
+    },
+    {
+      "parameters": {
+        "url": "https://raw.githubusercontent.com/atamnsor4-max/atagym-ai/refs/heads/main/AtaGym%20%E2%80%93%20%D7%9E%D7%99%D7%93%D7%A2%20%D7%A8%D7%A9%D7%9E%D7%99.txt",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "777bce5c-9408-4bd9-9eec-399772ca5daf",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        800,
+        176
+      ],
+      "id": "1551e9d8-73df-4c1b-9bf5-f90425120970",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an AI fitness and nutrition coach agent.\n\nYou answer only questions about:\n- workouts\n- gym training\n- muscle gain and fat loss\n- nutrition and diet\n- recovery\n- creatine and basic supplements\n\nIf the question is not related to fitness or nutrition — answer:\n\"I only answer fitness and nutrition questions.\"\n\nRules:\n- Keep answers short and clear\n- Give a small example or mini plan when useful\n- If important info is missing — ask 1–2 short questions\n\nUser question:\n{{$json.body.msg}}\n",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        624,
+        0
+      ],
+      "id": "6d82fcdf-aa7e-4dd0-a744-acc8ac6aa554",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        416,
+        176
+      ],
+      "id": "0046d20e-247c-4d83-bbbe-4178f941ef04",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "DcjH7y0HMgZPovFl",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        []
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "33ee8b56-0a9a-4a9b-bd02-d05b1ae991c3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "cd03958425c6125ba828261a2db167500a210957fdddc006cd33df571f57d72e"
+  },
+  "id": "mEDGRw7DurzJDDDB",
+  "tags": []
+}

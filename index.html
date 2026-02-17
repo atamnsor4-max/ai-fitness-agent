@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AI Fitness Chat</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .chat {
+      width: 600px;
+      max-width: 95%;
+      background: #020617;
+      border-radius: 16px;
+      box-shadow: 0 0 30px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .header {
+      padding: 16px;
+      font-size: 20px;
+      font-weight: bold;
+      background: #0f172a;
+      border-bottom: 1px solid #1f2937;
+    }
+
+    .messages {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+    }
+
+    .msg {
+      margin: 8px 0;
+      padding: 10px 14px;
+      border-radius: 12px;
+      max-width: 80%;
+      white-space: pre-wrap;
+    }
+
+    .user {
+      background: #2563eb;
+      align-self: flex-end;
+    }
+
+    .bot {
+      background: #1f2937;
+      align-self: flex-start;
+    }
+
+    .inputRow {
+      display: flex;
+      border-top: 1px solid #1f2937;
+    }
+
+    input {
+      flex: 1;
+      padding: 14px;
+      font-size: 16px;
+      border: none;
+      outline: none;
+      background: #020617;
+      color: white;
+    }
+
+    button {
+      padding: 14px 20px;
+      border: none;
+      background: #2563eb;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="chat">
+  <div class="header">AI Fitness Chat</div>
+
+  <div id="messages" class="messages"></div>
+
+  <div class="inputRow">
+    <input id="msg" placeholder="Ask about training, diet, creatine..." />
+    <button onclick="send()">Send</button>
+  </div>
+</div>
+
+<script>
+async function send() {
+  const input = document.getElementById("msg");
+  const text = input.value.trim();
+  if (!text) return;
+
+  addMsg(text, "user");
+  input.value = "";
+
+  try {
+    const res = await fetch("http://localhost:5678/webhook/atagym-chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ msg: text })
+    });
+
+    const data = await res.json();
+
+    addMsg(data.text || JSON.stringify(data), "bot");
+
+  } catch (e) {
+    addMsg("❌ Cannot reach webhook. Make sure n8n is running + workflow is Active.", "bot");
+  }
+}
+
+function addMsg(t, cls) {
+  const box = document.getElementById("messages");
+  const d = document.createElement("div");
+  d.className = "msg " + cls;
+  d.innerText = t;
+  box.appendChild(d);
+  box.scrollTop = box.scrollHeight;
+}
+</script>
+
+</body>
+</html>
